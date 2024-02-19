@@ -98,13 +98,14 @@ void Game_manager(char map[sizeH][sizeW]) {
 		coordY = Input_line();
 		printf("\ncoordY = %d\n", coordY);
 
-
+		//サブマップから爆弾位置の検査
 	}
 }
 
 int main()
 {
-	char map[sizeH][sizeW];
+	char map[sizeH][sizeW]; //ゲームマップ
+	char subMap[sizeH][sizeW]; //爆弾マップ
 	
 	Game_manager(map);
 
