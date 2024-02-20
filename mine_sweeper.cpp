@@ -7,6 +7,7 @@
 
 #define sizeH 10
 #define sizeW 10
+#define bomb 20
 
 //マップの初期化関数
 void Reset_map(char map[sizeH][sizeW]) {
@@ -17,9 +18,107 @@ void Reset_map(char map[sizeH][sizeW]) {
 	}
 }
 
+int Check_coordBomb(char subMap[sizeH][sizeW], int i, int j) {
+	//爆弾があるか
+	if (subMap[i][j] == 'B') {
+		return 1; //爆弾発見
+	}
+	else {
+		return 0; //爆弾なし
+	}
+}
+
+//サブマップの初期化関数
+void Reset_subMap(char subMap[sizeH][sizeW]) {
+	//初期化
+	Reset_map(subMap);
+
+	int countBomb = 0; //爆弾の個数計測用
+	int coordBomb[2] = { 0 }; //爆弾の座標
+	while (countBomb < bomb) {
+		//座標を生成
+		coordBomb[0] = rand() % 10; //爆弾X座標
+		coordBomb[1] = rand() % 10; //爆弾Y座標
+
+		//爆弾の位置が重なる場合
+		if (subMap[coordBomb[0]][coordBomb[1]] == 'B') {
+			continue;
+		}
+
+		//爆弾を生成できる場合
+		else {
+			subMap[coordBomb[0]][coordBomb[1]] = 'B'; //爆弾生成
+			countBomb++;
+
+			continue;
+		}
+	}
+
+	//爆弾の位置情報をマップに記述
+	for (int i = 0; i < sizeH; i++) {
+		for (int j = 0; j < sizeW; j++) {
+			countBomb = 0;
+
+			//爆弾がない場合
+			if (subMap[i][j] != 'B') {
+				//上段
+				if (i - 1 >= 0) {
+					//左上
+					if (j - 1 >= 0) {
+						countBomb += Check_coordBomb(subMap, i - 1, j - 1);
+					}
+
+					//真上
+					countBomb += Check_coordBomb(subMap, i - 1, j);
+
+					//右上
+					if (j + 1 < sizeW) {
+						countBomb += Check_coordBomb(subMap, i - 1, j + 1);
+					}
+				}
+
+				//中段・左
+				if (j - 1 >= 0) {
+					countBomb += Check_coordBomb(subMap, i, j - 1);
+				}
+
+				//中段・右
+				if (j + 1 < sizeW) {
+					countBomb += Check_coordBomb(subMap, i, j + 1);
+				}
+
+				//下段
+				if (i + 1 < sizeH) {
+					//左下
+					if (j - 1 >= 0) {
+						countBomb += Check_coordBomb(subMap, i + 1, j - 1);
+					}
+
+					//真下
+					countBomb += Check_coordBomb(subMap, i + 1, j);
+
+					//右下
+					if (j + 1 < sizeW) {
+						countBomb += Check_coordBomb(subMap, i + 1, j + 1);
+					}
+				}
+			}
+
+			//爆弾がある場合
+			else {
+				continue;
+			}
+
+			//個数の記入
+			//printf("countBomb = %d\n", countBomb);
+			subMap[i][j] = '0' + countBomb;
+		}
+	}
+}
+
 //マップの出力関数
 void Output_map(char map[sizeH][sizeW]) {
-	printf("  0 1 2 3 4 5 6 7 8 9\n");
+	printf("\n  0 1 2 3 4 5 6 7 8 9\n");
 	for (int i = 0; i < sizeH; i++) {
 		printf("%d", i);
 
@@ -60,7 +159,7 @@ int Input_line() {
 		char input = 0;
 		int inputFlag = 0; //入力の判定用
 
-		printf("\n入力(縦座標)：");
+		//printf("\n入力(縦座標)：");
 		scanf_s("%c", &input, 1);
 
 		//入力の検査
@@ -83,31 +182,47 @@ int Input_line() {
 	}
 }
 
-void Game_manager(char map[sizeH][sizeW]) {
+void Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
+	Reset_map(map);
+	Reset_subMap(subMap);
 
 	while (1) {
-		//マップの初期化と表示
-		Reset_map(map);
+		//---------------マップの初期化と表示
 		Output_map(map);
+		Output_map(subMap);
 
-		//入力の取得
+		//---------------入力の取得
 		int coordX = 0;
 		int coordY = 0;
-		coordX = Input_line();
-		printf("\ncoordX = %d\n", coordX);
-		coordY = Input_line();
-		printf("\ncoordY = %d\n", coordY);
 
-		//サブマップから爆弾位置の検査
+		printf("\n入力(縦座標)：");
+		coordY = Input_line();
+		//printf("\ncoordX = %d\n", coordX);
+		printf("\n入力(横座標)：");
+		coordX = Input_line();
+		//printf("\ncoordY = %d\n", coordY);
+
+		//-----------------サブマップから爆弾位置の検査
+		if (subMap[coordY][coordX] == 'B') {
+			//ゲームオーバー
+		}
+		else {
+			//mapに情報を開示
+			//printf("\nGame_manager : else\n");
+			map[coordY][coordX] = subMap[coordY][coordX];
+		}
 	}
 }
 
 int main()
 {
+	//乱数生成用
+	srand((unsigned int)time(NULL));
+
 	char map[sizeH][sizeW]; //ゲームマップ
 	char subMap[sizeH][sizeW]; //爆弾マップ
 	
-	Game_manager(map);
+	Game_manager(map, subMap);
 
 	return 0;
 }
