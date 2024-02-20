@@ -18,6 +18,7 @@ void Reset_map(char map[sizeH][sizeW]) {
 	}
 }
 
+//爆弾の有無判定関数
 int Check_coordBomb(char subMap[sizeH][sizeW], int i, int j) {
 	//爆弾があるか
 	if (subMap[i][j] == 'B') {
