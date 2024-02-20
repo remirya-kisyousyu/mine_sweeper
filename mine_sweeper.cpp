@@ -7,7 +7,7 @@
 
 #define sizeH 10
 #define sizeW 10
-#define bomb 20
+#define bomb 15
 
 //マップの初期化関数
 void Reset_map(char map[sizeH][sizeW]) {
@@ -153,6 +153,33 @@ void Delete_input(void) {
 	}
 }
 
+//入力の取得関数：リトライ、終了
+char IsGame_continue() {
+	while (1) {
+		char input = 0;
+
+		printf("\nリトライ：r, 終了：f\n");
+		scanf_s("%c", &input, 1);
+
+		//リトライ
+		if (input == 'r') {
+			Delete_input();
+			return input;
+		}
+
+		//終了
+		else if (input == 'f') {
+			Delete_input();
+			return input;
+		}
+
+		//その他入力
+		else {
+			printf("\n入力が正しくない\n");
+		}
+	}
+}
+
 //入力の取得関数
 int Input_line() {
 	while (1) {
@@ -182,14 +209,32 @@ int Input_line() {
 	}
 }
 
-void Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
+//ゲームクリア判定関数
+int IsGame_clear(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
+	for (int i = 0; i < sizeH; i++) {
+		for (int j = 0; j < sizeW; j++) {
+			//爆弾以外が残っているか
+			if (subMap[i][j] != 'B') {
+				if (subMap[i][j] != map[i][j]) {
+					return 0;
+				}
+			}
+		}
+	}
+
+	//ゲームクリア
+	return 1;
+}
+
+//ゲームの管理関数
+int Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 	Reset_map(map);
 	Reset_subMap(subMap);
 
 	while (1) {
 		//---------------マップの初期化と表示
 		Output_map(map);
-		Output_map(subMap);
+		//Output_map(subMap);
 
 		//---------------入力の取得
 		int coordX = 0;
@@ -205,11 +250,49 @@ void Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 		//-----------------サブマップから爆弾位置の検査
 		if (subMap[coordY][coordX] == 'B') {
 			//ゲームオーバー
+			char temp = 0; //戻り値の取得用 : IsGame_continue
+
+			printf("\nゲームオーバー\n");
+			temp = IsGame_continue();
+
+			//リトライ
+			if (temp == 'r') {
+				return 1;
+			}
+
+			//終了
+			else {
+				return 0;
+			}
+			
 		}
 		else {
 			//mapに情報を開示
 			//printf("\nGame_manager : else\n");
 			map[coordY][coordX] = subMap[coordY][coordX];
+		}
+
+		//ゲームクリア判定
+		int finishFlag = 0; //戻り値の取得用 : IsGame_clear
+
+		if (finishFlag == 0) {
+			continue;
+		}
+		else if(finishFlag == 1) {
+			char temp = 0; //戻り値の取得用 : IsGame_continue
+
+			printf("\nゲームクリア\n");
+			temp = IsGame_continue();
+
+			//リトライ
+			if (temp == 'r') {
+				return 1;
+			}
+
+			//終了
+			else {
+				return 0;
+			}
 		}
 	}
 }
@@ -222,7 +305,11 @@ int main()
 	char map[sizeH][sizeW]; //ゲームマップ
 	char subMap[sizeH][sizeW]; //爆弾マップ
 	
-	Game_manager(map, subMap);
+	int continueFlag = 1;
+	while (continueFlag) {
+		continueFlag = Game_manager(map, subMap);
+	}
+	
 
 	return 0;
 }
