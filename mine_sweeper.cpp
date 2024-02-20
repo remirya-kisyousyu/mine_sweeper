@@ -229,11 +229,12 @@ int IsGame_clear(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 
 //ゲームの管理関数
 int Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
+	//---------------マップの初期化
 	Reset_map(map);
 	Reset_subMap(subMap);
 
 	while (1) {
-		//---------------マップの初期化と表示
+		//---------------マップの表示
 		Output_map(map);
 		//Output_map(subMap);
 
@@ -273,7 +274,7 @@ int Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 			map[coordY][coordX] = subMap[coordY][coordX];
 		}
 
-		//ゲームクリア判定
+		//-------------------ゲームクリア判定
 		int finishFlag = 0; //戻り値の取得用 : IsGame_clear
 
 		if (finishFlag == 0) {
