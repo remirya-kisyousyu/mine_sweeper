@@ -187,7 +187,6 @@ int Input_line() {
 		char input = 0;
 		int inputFlag = 0; //入力の判定用
 
-		//printf("\n入力(縦座標)：");
 		scanf_s("%c", &input, 1);
 
 		//入力の検査
@@ -245,6 +244,7 @@ int Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 		printf("\n入力(縦座標)：");
 		coordY = Input_line();
 		//printf("\ncoordX = %d\n", coordX);
+		
 		printf("\n入力(横座標)：");
 		coordX = Input_line();
 		//printf("\ncoordY = %d\n", coordY);
@@ -270,7 +270,6 @@ int Game_manager(char map[sizeH][sizeW], char subMap[sizeH][sizeW]) {
 		}
 		else {
 			//mapに情報を開示
-			//printf("\nGame_manager : else\n");
 			map[coordY][coordX] = subMap[coordY][coordX];
 		}
 
